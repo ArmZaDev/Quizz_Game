@@ -1,0 +1,113 @@
+{
+  "Name": "QuizzGame",
+  "Quizz": [
+    {
+      "Quest": "1. 5\u002B5=10",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "0"
+      ]
+    },
+    {
+      "Quest": "2. 2\u002B3=4",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "1"
+      ]
+    },
+    {
+      "Quest": "3. 5\u002B6=11",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "0"
+      ]
+    },
+    {
+      "Quest": "4. 6-40=34",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "1"
+      ]
+    },
+    {
+      "Quest": "5. 1\u002B1=2",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "0"
+      ]
+    },
+    {
+      "Quest": "6. 1\u002B1=3",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "1"
+      ]
+    },
+    {
+      "Quest": "7. 8-8=8",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "0"
+      ]
+    },
+    {
+      "Quest": "8. 20-1=19",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "1"
+      ]
+    },
+    {
+      "Quest": "9. 6/2=3",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "0"
+      ]
+    },
+    {
+      "Quest": "10. 9/5\u002B6=10",
+      "Answers": [
+        "Yes",
+        "No"
+      ],
+      "RightAnswers": [
+        "1"
+      ]
+    }
+  ],
+  "Top20": {
+    "test2": 2,
+    "Nani": 3,
+    "Arm": 6,
+    "test3": 8,
+    "AS": 8,
+    "test001": 9
+  }
+}
