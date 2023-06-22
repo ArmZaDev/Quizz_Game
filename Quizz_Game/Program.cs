@@ -1,10 +1,4 @@
-﻿using ConsoleTables;
-using Quizz_Game.Games;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Quizz_Game
 {
@@ -14,7 +8,6 @@ namespace Quizz_Game
         {
             Game game = new Game();
             game.Play();
-
             Console.ReadKey();  
         }
     }

@@ -1,58 +1,78 @@
-﻿using Quizz_Game.Games;
+﻿using System;
+using Colorful;
+using System.Drawing;
+using Quizz_Game.Content;
 using Quizz_Game.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
+using Console = Colorful.Console;
 using static System.Console;
 
-namespace Quizz_Game.Content
+namespace Quizz_Game
 {
-    public class Authorization
+    public class Authorization:Encryptor
     {
+        private const string pathEncrypt = @".\file\Database.json.aes"; //Path Database Json File
+        private const string passWord = "1234567891234567"; //Key Encrypt And Decrypt Database
+
         public void Logistry()
         {
             Console.Clear();
-            Players player = new Players();
             Game game = new Game();
-            List<Players> players = new List<Players>();
+            Player player = new Player();
+            StyleSheet styleSheet = new StyleSheet(Color.LightGray);
 
-            const string path = "Users";
-            DirectoryInfo dict = new DirectoryInfo(path);
-            var Files = dict.GetFiles();
+            styleSheet.AddStyle("SIGN IN",Color.Orange);
+            styleSheet.AddStyle("Login", Color.LemonChiffon);
 
-            foreach (var file in Files)
+            Console.WriteLineStyled("\n\n\t\t\t\t\t     ------------| SIGN IN |------------", styleSheet);
+            Console.WriteStyled("\n\t\t\t\t\t\t    Login: ", styleSheet);
+            string playerLogin = Console.ReadLine(); // Enter Current Player Name
+
+            // Decrypt Data Player
+            string decryptedData = FileDecryptJson(pathEncrypt, passWord);
+            Database database = JsonConvert.DeserializeObject<Database>(decryptedData);
+
+            // Search Player Name In Database
+            foreach (Player pName in database.Players)
             {
-                using (FileStream fso = new FileStream(file.FullName, FileMode.Open))
-                {
-                    players.Add(JsonSerializer.Deserialize<Players>(fso)); fso.Close();
-                } 
+                if (playerLogin == pName.PlayerName) { player = pName; }
             }
 
-            Console.WriteLine("\n\n\t\t\t\t\t     ------------| SIGN IN |------------");
-            Console.Write("\n\t\t\t\t\t\t    Login: ");
-            String tempLogin = Console.ReadLine();
-
-            foreach (var item in players)
+            // Player same In Database
+            if (playerLogin == player.PlayerName)
             {
-                if (tempLogin == item.PlayerName) { player = item; }
+                Console.WriteLine("\tLogin successful!");
+                Console.WriteLine($"\tWelcome back [{player.PlayerName}] to Quiz Game");
+                WriteLine("\tPress any key..."); ReadKey();
+                game.QuizMenu(player);//Link To QuizMenu
             }
 
-            if (tempLogin == player.PlayerName)
-            {
-                game.QuizMenu(player);
-            }
+            // Player not same In Database
             else
             {
-                WriteLine("\n\t\t\t\t\t\t      Login not exist!");
+                Clear();
 
-                WriteLine("Press any key..."); Console.ReadKey();
-                Logistry();
+                string playerExist = "Invalid player name. Please try again.";
+
+                styleSheet.AddStyle("SIGN IN", Color.Red);
+                styleSheet.AddStyle(playerExist, Color.Red);
+                String loginError = "\n\n\t\t\t\t\t     ------------| SIGN IN |------------";
+
+                Console.WriteLineStyled(loginError, styleSheet);
+                Console.WriteLineStyled($"\t{playerExist}", styleSheet);
+                WriteLine("\tPress any key..."); ReadKey();
+
+                Logistry(); //Return to Logistry Page
             }
         }
+
+        
+
+
+
+
+
+
     }
 }

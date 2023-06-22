@@ -1,72 +1,83 @@
-﻿using Quizz_Game.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Quizz_Game.Model;
+using Quizz_Game.Content;
+using System.Drawing;
 using Newtonsoft.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using JsonSerializer = System.Text.Json.JsonSerializer;
-using Quizz_Game.Games;
+using Colorful;
 
 using static System.Console;
-using Nancy.Json;
+using Console = Colorful.Console;
 
-namespace Quizz_Game.Content
+namespace Quizz_Game
 {
-    public class Registration
+    public class Registration:Encryptor
     {
+        private const string pathEncrypt = @".\file\Database.json.aes"; //Path Database Json File
+        private const string passWord = "1234567891234567"; //Key Encrypt And Decrypt Database
 
         public void Registry() 
         {
             Clear();
-            Players player = new Players();
+            
             Game game = new Game();
-            List<Players> players = new List<Players>();
+            Player player = new Player();
+            StyleSheet styleSheet = new StyleSheet(Color.LightGray);
 
-            const string path = "Users";
-            DirectoryInfo dict = new DirectoryInfo(path);
-            var Files = dict.GetFiles();
-            foreach (var file in Files)
+            styleSheet.AddStyle("SIGN UP", Color.Orange);
+            styleSheet.AddStyle("PlayerName:", Color.LemonChiffon);
+
+            Console.WriteLineStyled("\n\n\t\t\t\t\t     ------------| SIGN UP |------------", styleSheet);
+            Console.WriteStyled("\n\t Enter your player name: ", styleSheet);
+            string playerLogin = Console.ReadLine(); //Enter New Player Name
+
+            //Decrypt Database 
+            string decryptedData = FileDecryptJson(pathEncrypt, passWord);
+            Database database = JsonConvert.DeserializeObject<Database>(decryptedData);
+
+            //Search Player Name In Database
+            foreach (Player pName in database.Players)
             {
-                using (FileStream fso = new FileStream(file.FullName, FileMode.Open))
-                {
-                    players.Add(JsonSerializer.Deserialize<Players>(fso)); fso.Close();
-                }
-
+                if (playerLogin == pName.PlayerName) { player = pName; }
             }
 
-            Console.WriteLine("\n\n\t\t\t\t\t     ------------| SIGN UP |------------");
-            Console.Write("\n\t\t\t\t\t\t    PlayerName: ");
-            String tempLogin = Console.ReadLine();
-
-            if (tempLogin.Length == 0) 
-            { tempLogin = Console.ReadLine(); }
-
-            foreach (var item in players)
+            // Player same In Database
+            if (playerLogin != player.PlayerName)
             {
-                if (tempLogin == item.PlayerName) { player = item; }
+                player.PlayerName = playerLogin;
+                database.Players.Add(player);
+
+                //Decrypt Data Player And Update New Player
+                FileEncryptJson(pathEncrypt, passWord, database);
+
+                Console.WriteLine("\n\tRegistration successful!");
+                Console.WriteLine($"\t Welcome to Quiz Game [{player.PlayerName}]");
+                WriteLine("\tPress any key..."); ReadKey();
+                game.QuizMenu(player); // Link to QuizMenu 
             }
 
-            if (tempLogin != player.PlayerName)
-            {
-                player.PlayerName = tempLogin;
-
-                using (FileStream fs = new FileStream($"{path}\\{player.PlayerName}.json", FileMode.Append))
-                {
-                    JsonSerializer.Serialize(fs, player, new JsonSerializerOptions { WriteIndented = true }); fs.Close();
-                }
-                game.QuizMenu(player);
-            }
+            // Player not same In Database
             else
             {
-                WriteLine("\n\t\t\t\t\t\t      Such user already exists!");
 
-                WriteLine("Press any key..."); Console.ReadKey();
-                Registry();
+                Clear();
+
+                string playerExists = "The player database already exists. Registration is not allowed.";
+
+                styleSheet.AddStyle("SIGN UP", Color.Red);
+                styleSheet.AddStyle(playerExists, Color.Red);
+
+                String loginError = "\n\n\t\t\t\t\t     ------------| SIGN UP |------------";
+                Console.WriteLineStyled(loginError, styleSheet);
+                Console.WriteLineStyled($"\n\t{ playerExists}", styleSheet);
+                WriteLine("\tPress any key..."); ReadKey();
+
+                Registry();//Return Registry Page
             }
         }
+
+
+
+
+
     }
 }
