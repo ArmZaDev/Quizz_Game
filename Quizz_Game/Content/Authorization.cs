@@ -1,24 +1,28 @@
 ﻿using System;
 using Colorful;
 using System.Drawing;
-using Quizz_Game.Content;
 using Quizz_Game.Model;
-using Newtonsoft.Json;
+using System.Linq;
 
 using Console = Colorful.Console;
 using static System.Console;
 
 namespace Quizz_Game
 {
-    public class Authorization:Encryptor
+    internal class Authorization
     {
-        private const string pathEncrypt = @".\file\Database.json.aes"; //Path Database Json File
-        private const string passWord = "1234567891234567"; //Key Encrypt And Decrypt Database
+        private Game _game;
+        private Database _database;
+        public Authorization(Database database, Game game)
+        {
+            _database = database;
+            _game = game;
+        }
 
         public void Logistry()
         {
             Console.Clear();
-            Game game = new Game();
+          
             Player player = new Player();
             StyleSheet styleSheet = new StyleSheet(Color.LightGray);
 
@@ -27,25 +31,16 @@ namespace Quizz_Game
 
             Console.WriteLineStyled("\n\n\t\t\t\t\t     ------------| SIGN IN |------------", styleSheet);
             Console.WriteStyled("\n\t\t\t\t\t\t    Login: ", styleSheet);
-            string playerLogin = Console.ReadLine(); // Enter Current Player Name
-
-            // Decrypt Data Player
-            string decryptedData = FileDecryptJson(pathEncrypt, passWord);
-            Database database = JsonConvert.DeserializeObject<Database>(decryptedData);
-
-            // Search Player Name In Database
-            foreach (Player pName in database.Players)
-            {
-                if (playerLogin == pName.PlayerName) { player = pName; }
-            }
+            string inputPlayerName = Console.ReadLine(); // Enter Current Player Name
 
             // Player same In Database
-            if (playerLogin == player.PlayerName)
+            if (_database.Players.Any(a => a.PlayerName.ToLower() == inputPlayerName.ToLower()))
             {
-                Console.WriteLine("\tLogin successful!");
+                player.PlayerName = inputPlayerName;
+                Console.WriteLine("\n\tLogin successful!");
                 Console.WriteLine($"\tWelcome back [{player.PlayerName}] to Quiz Game");
                 WriteLine("\tPress any key..."); ReadKey();
-                game.QuizMenu(player);//Link To QuizMenu
+                _game.QuizMenu(player);
             }
 
             // Player not same In Database

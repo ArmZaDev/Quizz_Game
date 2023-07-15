@@ -37,3 +37,5 @@ C:\Users\arztv\Desktop\Dev\Quizz_Game\Quizz_Game\bin\Debug\System.Security.Acces
 C:\Users\arztv\Desktop\Dev\Quizz_Game\Quizz_Game\bin\Debug\System.Security.Principal.Windows.dll
 C:\Users\arztv\Desktop\Dev\Quizz_Game\Quizz_Game\bin\Debug\System.Security.AccessControl.xml
 C:\Users\arztv\Desktop\Dev\Quizz_Game\Quizz_Game\bin\Debug\System.Security.Principal.Windows.xml
+C:\Users\arztv\Desktop\Dev\Quizz_Game\Quizz_Game\bin\Debug\ConsoleTables.dll
+C:\Users\arztv\Desktop\Dev\Quizz_Game\Quizz_Game\bin\Debug\ConsoleTables.pdb

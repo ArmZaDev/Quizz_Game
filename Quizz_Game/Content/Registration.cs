@@ -1,25 +1,27 @@
 ﻿using System;
 using Quizz_Game.Model;
-using Quizz_Game.Content;
 using System.Drawing;
-using Newtonsoft.Json;
 using Colorful;
+using System.Linq;
 
 using static System.Console;
 using Console = Colorful.Console;
 
 namespace Quizz_Game
 {
-    public class Registration:Encryptor
+    internal class Registration
     {
-        private const string pathEncrypt = @".\file\Database.json.aes"; //Path Database Json File
-        private const string passWord = "1234567891234567"; //Key Encrypt And Decrypt Database
-
+        private Game _game;
+        private Database _database;
+        public Registration(Database database, Game game)
+        {
+            _database = database;
+            _game = game;
+        }
         public void Registry() 
         {
             Clear();
             
-            Game game = new Game();
             Player player = new Player();
             StyleSheet styleSheet = new StyleSheet(Color.LightGray);
 
@@ -28,31 +30,19 @@ namespace Quizz_Game
 
             Console.WriteLineStyled("\n\n\t\t\t\t\t     ------------| SIGN UP |------------", styleSheet);
             Console.WriteStyled("\n\t Enter your player name: ", styleSheet);
-            string playerLogin = Console.ReadLine(); //Enter New Player Name
-
-            //Decrypt Database 
-            string decryptedData = FileDecryptJson(pathEncrypt, passWord);
-            Database database = JsonConvert.DeserializeObject<Database>(decryptedData);
-
-            //Search Player Name In Database
-            foreach (Player pName in database.Players)
-            {
-                if (playerLogin == pName.PlayerName) { player = pName; }
-            }
+            string inputPlayerName = Console.ReadLine(); //Enter New Player Name
 
             // Player same In Database
-            if (playerLogin != player.PlayerName)
+            if (!_database.Players.Any(a=>a.PlayerName.ToLower()== inputPlayerName.ToLower()))
             {
-                player.PlayerName = playerLogin;
-                database.Players.Add(player);
-
-                //Decrypt Data Player And Update New Player
-                FileEncryptJson(pathEncrypt, passWord, database);
+                player.PlayerName = inputPlayerName;
+                _database.Players.Add(player);
 
                 Console.WriteLine("\n\tRegistration successful!");
                 Console.WriteLine($"\t Welcome to Quiz Game [{player.PlayerName}]");
                 WriteLine("\tPress any key..."); ReadKey();
-                game.QuizMenu(player); // Link to QuizMenu 
+
+                _game.QuizMenu(player);
             }
 
             // Player not same In Database

@@ -7,9 +7,10 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using Quizz_Game.Model;
 
-namespace Quizz_Game.Content
+namespace Quizz_Game
 {
-    public class Encryptor
+
+    internal sealed class Encryptor
     {
         [DllImport("KERNEL32.DLL", EntryPoint = "RtlZeroMemory")]
         public static extern bool ZeroMemory(IntPtr Destination, int Length);
@@ -92,7 +93,7 @@ namespace Quizz_Game.Content
         }
 
         // FileDecrypt Database
-        public void FileDecrypt(string inputFile, string outputFile, string password)
+        public static void FileDecrypt(string inputFile, string outputFile, string password)
         {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             byte[] salt = new byte[32];
@@ -155,7 +156,7 @@ namespace Quizz_Game.Content
         }
 
         // Decrypt Value 
-        public string FileDecryptJson(string inputFile, string password)
+        public static string FileDecryptJson(string inputFile, string password)
         {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             byte[] salt = new byte[32];
@@ -188,7 +189,7 @@ namespace Quizz_Game.Content
         }
 
         // Encrypt Value 
-        public void FileEncryptJson(string inputFile, string password, Database data)
+        public static void FileEncryptJson(string inputFile, string password, Database data)
         {
             // Generate random salt
             byte[] salt = GenerateRandomSalt();

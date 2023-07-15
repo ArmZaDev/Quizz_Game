@@ -14,6 +14,7 @@ namespace Quizz_Game.Model
     {
         public string PlayerName { get; set; }
         public int Score { get; set; }
+        public double Time { get; set; }
     }
 
 

@@ -1,11 +1,17 @@
-﻿using System;
+﻿using Quizz_Game.Model;
+using System;
+using System.Linq;
 
 namespace Quizz_Game
 {
-    public class Table
+    internal class Table
     {
-        //table width
-        static int tableWidth = 73;
+        private Database _database;
+        public Table(Database database)
+        {
+            _database = database;
+        }
+        int tableWidth = 48;
 
         public void PrintLine()
         {
@@ -19,10 +25,39 @@ namespace Quizz_Game
 
             foreach (string column in columns)
             {
-                row += AlignCentre(column, width) + "|";
+                if (_database.Players.Any(a => Convert.ToString(a.Time) == column))
+                {
+                    row += AlignRight(column, width) + "|";
+                }
+                else
+                {
+                    row += AlignCentre(column, width) + "|";
+                }
             }
 
             Console.WriteLine(row);
+        }
+
+        public void PrintTable(Database database)
+        {
+            string[] headers = { "Player", "Score", "Time(ms)" };
+
+            PrintLine();
+            PrintRow(headers);
+            PrintLine();
+
+            foreach (Player player in database.Players)
+            {
+                string[] row = new string[headers.Length];
+
+                row[0] = player.PlayerName;
+                row[1] = Convert.ToString($"{player.Score}/10");
+                row[2] = Convert.ToString($"{player.Time}");
+                //row[2] = AlignRight(Convert.ToString(player.Time), tableWidth / headers.Length);
+
+                PrintRow(row);
+                PrintLine();
+            }
         }
 
         static string AlignCentre(string text, int width)
@@ -37,6 +72,13 @@ namespace Quizz_Game
             {
                 return text.PadRight(width - (width - text.Length) / 2).PadLeft(width);
             }
+        }
+
+        static string AlignRight(string text,int width)
+        {
+            return text.PadLeft(15);
+            //return text;
+            //return text.PadLeft(width + (width - text.Length));
         }
     }
 }

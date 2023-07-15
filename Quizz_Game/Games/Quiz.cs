@@ -1,40 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using Quizz_Game.Model;
-using Quizz_Game.Content;
-using Newtonsoft.Json;
 using System.Drawing;
 using Colorful;
+using System.Linq;
 
 using Console = Colorful.Console;
 
 namespace Quizz_Game
 { 
-    public class Quiz:Encryptor
+    internal class Quiz
     {
-
-        private const string pathEncrypt = @".\file\Database.json.aes"; //Path Database Json File
-        private const string passWord = "1234567891234567"; //Key Encrypt And Decrypt Database
+        private Database _database;
+        private DateTime startTime;
+        private DateTime endTime;
+        public Quiz(Database database)
+        {
+            _database = database;
+        }
+        
 
         public void Start(Player player, bool rnd = false)
         {
-            Player score = new Player();
-            Quiz quiz = new Quiz();
             int countOfRightAnswers = 0;
+            startTime = DateTime.Now;// Start Time
+
             StyleSheet styleSheet = new StyleSheet(Color.LightGray);
 
             styleSheet.AddStyle("Enter", Color.LemonChiffon);
             styleSheet.AddStyle("Question", Color.LightBlue);
             styleSheet.AddStyle("Answers", Color.LightGreen);
 
-            // Decrypt Data Player
-            string decryptedData = FileDecryptJson(pathEncrypt, passWord);
-            Database database = JsonConvert.DeserializeObject<Database>(decryptedData);
-
             Console.Clear();
 
             // Question Display
-            foreach (var question in database.Quizz)
+            foreach (var question in _database.Quizz)
             {
                 bool RIGHT = true;
                 List<String> userAnswers = new List<string>();
@@ -67,36 +67,38 @@ namespace Quizz_Game
                 if (RIGHT) { countOfRightAnswers++; }
             }
 
-            Console.WriteLine($"{countOfRightAnswers}/{database.Quizz.Count} are right");
+            endTime = DateTime.Now; // End Time
+            TimeSpan totalTime = endTime - startTime; // Total Time
 
-            if (!rnd) { LeaderBoard(player, countOfRightAnswers); }
+            double timeMilliseconds = totalTime.TotalMilliseconds / 1000.0;
+
+            Console.WriteLine($"{countOfRightAnswers}/{_database.Quizz.Count} are right");
+            Console.WriteLine($"tatalTime {timeMilliseconds} ms");
+
+
+            if (!rnd) { LeaderBoard(player, countOfRightAnswers, timeMilliseconds); }
             Console.WriteLine("Press any key..."); Console.ReadKey();
         }
 
-        public void LeaderBoard(Player player, int persent)
+        public void LeaderBoard(Player player, int persent, double totalTime)
         {
-            Player score = new Player();
-            // Decrypt Data Player
-            string decryptedData = FileDecryptJson(pathEncrypt, passWord);
-            Database database = JsonConvert.DeserializeObject<Database>(decryptedData);
+            Player foundPlayer = _database.Players.FirstOrDefault(p => p.PlayerName == player.PlayerName);
 
-            //เพิ่มคะแนนผู้เล่น
-            foreach (var item in database.Players)
+            if (foundPlayer != null)
             {
-                if (score.Score <= item.Score && player.PlayerName == item.PlayerName)
+                if (foundPlayer.Score < persent)
                 {
-                    score = item;
-                    player = item;
+                    foundPlayer.Score = persent;
                 }
-            }
 
-            if (score.Score <= persent)
+                foundPlayer.Time = totalTime;
+            }
+            else
             {
-                score.Score = persent;
+                player.Score = persent;
+                player.Time = totalTime;
+                _database.Players.Add(player);
             }
-
-            //เข้ารหัสข้อมูลคะแนนผูเล่น
-            FileEncryptJson(pathEncrypt, passWord, database);
         }
 
         //ลองทำ

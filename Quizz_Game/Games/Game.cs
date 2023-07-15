@@ -1,20 +1,16 @@
 ﻿using System;
-using Quizz_Game.Content;
 using Quizz_Game.Model;
 using Colorful;
 using System.Drawing;
-using Newtonsoft.Json;
 
 using static System.Console;
 using Console = Colorful.Console;
 
 namespace Quizz_Game
 {
-    public class Game:Encryptor
-    {
-        private const string pathEncrypt = @".\file\Database.json.aes"; //Path Database Json File
-        private const string passWord = "1234567891234567"; //Key Encrypt And Decrypt Database
 
+    internal class Game : IDisposable
+    {
         private string GameTitleArt = @"
  
   ______   __    __  ______  ________         ______    ______   __       __  ________ 
@@ -33,6 +29,21 @@ namespace Quizz_Game
 
         private string GameTitle = "Quiz Game";
 
+        private Database _database;
+        Authorization auth;
+        Registration regn;
+        Quiz quiz;
+        Table table;
+        Action<string,Database> _action;
+        public Game(Database database, Action<string, Database> action=null)
+        {
+            _database = database;
+            auth = new Authorization(database, this);
+            regn = new Registration(database, this);
+            quiz = new Quiz(database);
+            table = new Table(database);
+            _action = action;
+        }
         // Start Game
         public void Play()
         {
@@ -42,7 +53,7 @@ namespace Quizz_Game
             styleSheet.AddStyle(GameTitleArt, Color.OrangeRed);
 
             Console.WriteLine(GameTitleArt);
-            Console.WriteLineStyled($"Welcome to { GameTitle}", styleSheet);
+            Console.WriteLineStyled($"Welcome to { GameTitle }", styleSheet);
             WriteLine("Press any key...");
             ReadKey();
 
@@ -98,16 +109,15 @@ namespace Quizz_Game
         // StartMenu
         public void StartMenu()
         {
-            Authorization auth = new Authorization();
-            Registration regn = new Registration();
+          
             bool EXT = true;
             while (EXT != false)
             {
                 ShowStartMenu(); 
                 String choice = ReadLine();
-                if (choice == "0") { EXT = false; Environment.Exit(0); }
-                else if (choice == "1") { EXT = false; auth.Logistry(); }
-                else if (choice == "2") { EXT = false; regn.Registry(); }
+                if (choice == "0") { EXT = false; }
+                else if (choice == "1") {   auth.Logistry(); }
+                else if (choice == "2") {   regn.Registry(); }
             }
         }
 
@@ -131,15 +141,9 @@ namespace Quizz_Game
                 String choice = ReadLine();
                 switch (choice)
                 {
-                    case "0": { StartMenu(); } break;
+                    case "0": { EXT = false; } break;
                     case "1":
                         {
-                            Clear();
-                            Quiz quiz = new Quiz();
-
-                            //Decrypt Data Player
-                            string decryptedData = FileDecryptJson(pathEncrypt, passWord);
-                            Database database = JsonConvert.DeserializeObject<Database>(decryptedData);
 
                             Clear();
                             Console.WriteLineStyled($"\n\n\t\t\t\t\t    ------------| {quizz} |------------", styleSheet);
@@ -149,26 +153,15 @@ namespace Quizz_Game
                             Console.WriteStyled("\t\t\t\t\t    Enter: ", styleSheet);
                             String chs = ReadLine();
 
-                            Table table = new Table();
+                            // Print table
                             if (chs == "1") { quiz.Start(player); }
                             else if (chs == "2")
                             {
                                 Clear();
 
-                                // Create a player score table.
-                                WriteLine($"\n\n\t\t\t\tScore Player");
-                                table.PrintLine();
-                                table.PrintRow("Player", "Score");
-                                table.PrintLine();
-
-                                // Search Score Player
-                                foreach (var str in database.Players)
-                                {
-                                    // Show Score
-                                    table.PrintRow(str.PlayerName, Convert.ToString(str.Score));
-                                    table.PrintLine();
-                                    //Console.WriteLine($"\t\t\t\t\t\t      {str.Key} | {str.Value} / {quiz.Quizz.Count}");
-                                }
+                                // Score Table
+                                WriteLine($"\n\n\t\t   Score Player");
+                                table.PrintTable(_database);
                                 WriteLine("Press any key..."); ReadKey();
                             }
                             break;
@@ -177,12 +170,19 @@ namespace Quizz_Game
             }
         }
 
-        
-        
+        public void Dispose()
+        {
+            if (_action != null)
+            {
+                Console.WriteLine("Save game? Y/N");
+                string command = Console.ReadLine();
+                _action(command, _database);
 
-
-
-
+            }
+            GC.SuppressFinalize(this);
+            //  Environment.Exit(0);
+        }
+        // Protected implementation of Dispose pattern.
 
     }
 }

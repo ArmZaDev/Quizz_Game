@@ -2,15 +2,8 @@
   "Players": [
     {
       "PlayerName": "t1",
-      "Score": 6
-    },
-    {
-      "PlayerName": "t2",
-      "Score": 4
-    },
-    {
-      "PlayerName": "t3",
-      "Score": 7
+      "Score": 6,
+      "Time": 10
     }
   ],
   "Quizz": [
